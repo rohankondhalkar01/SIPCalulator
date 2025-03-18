@@ -1,0 +1,96 @@
+import React, { useState, useEffect } from "react";
+
+const SipCalculator = () => {
+  const [monthlyInvestment, setMonthlyInvestment] = useState("");
+  const [rateOfReturn, setRateOfReturn] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [maturityAmount, setMaturityAmount] = useState(null);
+  const [quote, setQuote] = useState("");
+
+  const quotes = [
+    "The best investment you can make is in yourself. - Warren Buffett",
+    "Do not save what is left after spending, but spend what is left after saving. - Warren Buffett",
+    "An investment in knowledge pays the best interest. - Benjamin Franklin",
+    "Someone is sitting in the shade today because someone planted a tree a long time ago. - Warren Buffett",
+    "The stock market is filled with individuals who know the price of everything, but the value of nothing. - Philip Fisher",
+    "Time in the market beats timing the market. - Unknown",
+    "The goal of the investor should be to purchase at a rational price, a part interest in an easily understandable business. - Warren Buffett",
+    "Money grows when you save and invest wisely. - Unknown",
+    "Every successful investor begins with a plan. - Unknown",
+    "Opportunities come infrequently. When it rains gold, put out the bucket, not the thimble. - Warren Buffett",
+  ];
+
+  useEffect(() => {
+    changeQuote();
+    const interval = setInterval(changeQuote, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const changeQuote = () => {
+    const randomIndex = Math.floor(Math.random() * quotes.length);
+    setQuote(quotes[randomIndex]);
+  };
+
+  const formatNumber = (value) => {
+    return value.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  };
+
+  const handleInvestmentChange = (e) => {
+    const rawValue = e.target.value.replace(/,/g, "");
+    if (!isNaN(rawValue)) {
+      setMonthlyInvestment(formatNumber(rawValue));
+    }
+  };
+
+  const calculateSIP = () => {
+    const r = rateOfReturn / 100 / 12;
+    const n = duration * 12;
+    const investment = parseFloat(monthlyInvestment.replace(/,/g, ""));
+    const maturity = investment * ((Math.pow(1 + r, n) - 1) / r) * (1 + r);
+    setMaturityAmount(maturity.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ","));
+  };
+
+  return (
+    <div className="p-8 max-w-lg mx-auto bg-white shadow-xl rounded-2xl text-center">
+      <h2 className="text-2xl font-bold text-indigo-600">SIP Calculator</h2>
+      <div className="mt-4 space-y-3">
+        <input
+          type="text"
+          value={monthlyInvestment}
+          placeholder="Monthly Investment (₹)"
+          className="w-full p-2 border rounded-lg"
+          onChange={handleInvestmentChange}
+        />
+        <input
+          type="number"
+          placeholder="Annual Return Rate (%)"
+          className="w-full p-2 border rounded-lg"
+          onChange={(e) => setRateOfReturn(Number(e.target.value))}
+        />
+        <input
+          type="number"
+          placeholder="Investment Duration (years)"
+          className="w-full p-2 border rounded-lg"
+          onChange={(e) => setDuration(Number(e.target.value))}
+        />
+        <button
+          onClick={calculateSIP}
+          className="w-full p-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"
+        >
+          Calculate
+        </button>
+      </div>
+      {maturityAmount && (
+        <div className="mt-4 text-xl font-semibold text-green-600">
+          Maturity Amount: ₹{maturityAmount}
+        </div>
+      )}
+      <div className="mt-6 p-4 bg-indigo-100 rounded-lg text-indigo-700 italic">
+        "{quote}"
+      </div>
+      <div className="mt-4 text-gray-500 text-sm">&copy; 2025 Made by Rohan Kondhalkar</div>
+    </div>
+  );
+};
+
+export default SipCalculator;
